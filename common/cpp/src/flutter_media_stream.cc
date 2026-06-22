@@ -436,21 +436,7 @@ void FlutterMediaStream::GetUserVideo(const EncodableMap& constraints,
 void FlutterMediaStream::GetSources(std::unique_ptr<MethodResultProxy> result) {
   EncodableList sources;
 
-  // On Windows the ADM caches RecordingDevices() == 0 unless an audio
-  // pipeline has been created.  Create a throw-away source to force
-  // MMDevice endpoint enumeration inside libwebrtc.
   int nb_audio_devices = base_->audio_device_->RecordingDevices();
-  if (nb_audio_devices == 0) {
-    RTCAudioOptions opts;
-    opts.echo_cancellation = false;
-    opts.noise_suppression = false;
-    opts.auto_gain_control = false;
-    opts.highpass_filter = false;
-    base_->factory_->CreateAudioSource(
-        "enum_probe", RTCAudioSource::SourceType::kMicrophone, opts);
-    nb_audio_devices = base_->audio_device_->RecordingDevices();
-  }
-
   char strNameUTF8[RTCAudioDevice::kAdmMaxDeviceNameSize + 1] = {0};
   char strGuidUTF8[RTCAudioDevice::kAdmMaxGuidSize + 1] = {0};
 
